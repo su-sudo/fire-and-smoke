@@ -13,7 +13,7 @@ INIT_LR = 0.1
 BATCH_SIZE = 64
 NUM_EPOCHS = 50
 lr_find = True
-classes = ['Fire', 'Non_Fire']
+classes = ['Fire', 'Smoke', 'Non_Fire']
 
 images = []
 labels = []
@@ -21,7 +21,7 @@ count =0
 for c in classes:
     #try:
         for img in os.listdir('Image Dataset/' + c):
-            if count ==2687:
+            if count ==2749: #added this line because prgrm keep crashing while accessing last images in non fire folder
                 break
             img = cv2.imread('Image Dataset/' + c + '/' + img)
 
@@ -29,7 +29,13 @@ for c in classes:
             print("directory accessed",count,c)
             img = cv2.resize(img, (128, 128))
             images.append(img)
-            labels.append([0, 1][c == 'Fire'])
+            if c=='Fire':
+                labels.append(0)
+            elif c=='Smoke':
+                labels.append(1)
+            else:
+                labels.append(2)
+            #labels.append([0, 1][c == 'Fire'])
     #except:
         #print("failed")
         #pass
@@ -42,13 +48,14 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 labels = np.array(labels)
-labels = np_utils.to_categorical(labels,num_classes=2)
+labels = np_utils.to_categorical(labels,num_classes=3)
 print("to category")
 d = {}
 classTotals = labels.sum(axis=0)
 classWeight = classTotals.max() / classTotals
 d[0] = classWeight[0]
 d[1] = classWeight[1]
+d[2] = classWeight[2]
 print("test train split")
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.25, shuffle=True, random_state=42)
 print("augmentation")
@@ -101,12 +108,13 @@ model.add(BatchNormalization())
 model.add(Dropout(0.5))
 print("output node")
 # softmax classifier
+print(f"&&& {len(classes)}&&&&&&")
 model.add(Dense(len(classes)))
 model.add(Activation("softmax"))
 print("optimization")
 opt = SGD(learning_rate=INIT_LR, momentum=0.9,decay=INIT_LR / NUM_EPOCHS)
 
-model.compile(loss='binary_crossentropy',
+model.compile(loss='categorical_crossentropy',
               optimizer=opt,
               metrics=['accuracy'])
 

@@ -43,13 +43,13 @@ for layer in base_model.layers:
 
 
 labels = np.array(labels)
-labels = np_utils.to_categorical(labels,num_classes=2)
+labels = np_utils.to_categorical(labels,num_classes=1)
 print("to category")
 d = {}
 classTotals = labels.sum(axis=0)
-classWeight = classTotals.max() / classTotals
-d[0] = classWeight[0]
-d[1] = classWeight[1]
+classWeight = classTotals.max() / 1#classTotals
+#d[0] = classWeight[0]
+#d[1] = classWeight[1]
 print("test train split")
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.25, shuffle=True, random_state=42)
 print("augmentation")
