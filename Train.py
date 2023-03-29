@@ -22,7 +22,7 @@ classes = ['Fire', 'Smoke', 'Non_Fire']
 
 images = []
 labels = []
-#count =0
+count =0
 for c in classes:
     #try:
         for img in os.listdir('Image Dataset/' + c):
@@ -40,6 +40,8 @@ for c in classes:
                 labels.append(1)
             else:
                 labels.append(2)
+
+            count+=1
             #labels.append([0, 1][c == 'Fire'])
     #except:
         #print("failed")
